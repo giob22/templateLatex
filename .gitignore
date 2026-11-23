@@ -1,0 +1,20 @@
+# file di compilazione LaTeX
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.fdb_latexmk
+*.fls
+
+# esito dei test (si rigenera con run-tests.lua)
+**/test/build/
+
+# archivi di rilascio (si rigenerano con tools/release.py)
+*.zip
+
+# copie dei pacchetti fatte per provare a mano nella cartella prova/
+prova/asicmargins.*
+prova/topomargins.*
+prova/margincore.*
+prova/*.pdf

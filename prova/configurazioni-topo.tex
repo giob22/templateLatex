@@ -1,0 +1,165 @@
+% !TEX program = lualatex
+%
+% Prova delle configurazioni di topomargins.   Compila con:   lualatex configurazioni-topo.tex
+% (oppure:  compila.bat configurazioni-topo.tex).  Serve LuaLaTeX.
+%
+% COME SI USA
+%   1. Qui sotto ci sono molte configurazioni, una per riga, tutte commentate con %.
+%   2. Togli il % davanti a UNA riga e ricompila. Se ne attivi piu' d'una vale l'ultima.
+%   3. La prima pagina scrive quali opzioni sono attive.
+%   4. Senza "seed=" il disegno cambia a ogni compilazione: il numero scelto e' nel
+%      file configurazioni-topo.log ("topomargins: seed N (casuale; ...)"). Scrivilo in
+%      seed=N per rivedere quella composizione.
+%
+% topomargins.sty, topomargins.lua, margincore.sty e margincore.lua devono stare in questa cartella.
+
+\documentclass[11pt,twoside]{article}   % lascia twoside: serve per vedere la specchiatura
+\usepackage[italian]{babel}
+\usepackage{lipsum}
+
+% ======================================================================
+%  FORMATO DELLA PAGINA   (di default vale la prima riga)
+%  Con formati diversi da A4 attiva anche  autoscale=true  nelle opzioni.
+% ======================================================================
+\def\formato{a4paper,inner=3.2cm,outer=4cm,top=3.6cm,bottom=3.6cm,marginparwidth=2.4cm}
+%\def\formato{a4paper,margin=2.2cm,marginparwidth=1.6cm}                        % margini stretti
+%\def\formato{a4paper,margin=5cm,marginparwidth=3cm}                            % margini larghi
+%\def\formato{a5paper,inner=1.9cm,outer=2.3cm,top=2cm,bottom=2cm,marginparwidth=1.5cm}      % A5
+%\def\formato{letterpaper,inner=2.8cm,outer=3.6cm,top=3cm,bottom=3cm,marginparwidth=2.2cm}  % US letter
+
+\usepackage[\formato]{geometry}
+
+% ======================================================================
+%  OPZIONI DI topomargins   (di default nessuna: seme casuale, tutto intorno)
+% ======================================================================
+\def\opzioni{}
+
+% ---- Seme: stesso numero = stesso paesaggio --------------------------
+%\def\opzioni{seed=7}                      % tutto intorno, seme fisso
+%\def\opzioni{seed=1}
+%\def\opzioni{seed=2}
+%\def\opzioni{seed=random}                 % come non scrivere nulla
+
+% ---- Palette ---------------------------------------------------------
+%\def\opzioni{seed=7,palette=sepia}        % marrone (predefinita)
+%\def\opzioni{seed=7,palette=ink}          % blu con le curve maestre dorate
+%\def\opzioni{seed=7,palette=mono}         % scala di grigi
+%\def\opzioni{seed=7,palette=sea}          % carta nautica
+
+% ---- DOVE: lati (seme fisso, cosi' si confrontano) -------------------
+%\def\opzioni{seed=7,where=top}            % solo sopra
+%\def\opzioni{seed=7,where=bottom}         % solo sotto
+%\def\opzioni{seed=7,where=topbottom}      % sopra e sotto
+%\def\opzioni{seed=7,where=sides}          % solo ai lati
+%\def\opzioni{seed=7,where=left}           % solo a sinistra
+%\def\opzioni{seed=7,where=right}          % solo a destra
+
+% ---- DOVE: angoli ----------------------------------------------------
+%\def\opzioni{seed=7,where=topleft}
+%\def\opzioni{seed=7,where=topright}
+%\def\opzioni{seed=7,where=bottomleft}
+%\def\opzioni{seed=7,where=bottomright}
+%\def\opzioni{seed=7,where={topleft,bottomright}}   % due angoli opposti
+%\def\opzioni{seed=7,where={topright,bottomleft}}
+%\def\opzioni{seed=7,where=corners}                  % i quattro angoli
+
+% ---- DOVE: combinazioni di lati e angoli -----------------------------
+%\def\opzioni{seed=7,where={top,bottomleft}}
+%\def\opzioni{seed=7,where={left,topright}}
+
+% ---- Rilievo: quante curve e che forma -------------------------------
+%\def\opzioni{seed=7,levels=15}            % poche curve, terreno semplice
+%\def\opzioni{seed=7,levels=70}            % molte curve
+%\def\opzioni{seed=7,levels=70,index=10}   % molte curve, una maestra ogni 10
+%\def\opzioni{seed=7,index=3}              % curve maestre piu' frequenti
+%\def\opzioni{seed=7,feature=90}           % terreno molto mosso
+%\def\opzioni{seed=7,feature=400,levels=25}   % forme ampie e dolci
+%\def\opzioni{seed=7,hills=false}          % niente colline negli angoli
+%\def\opzioni{seed=7,peaks=false}          % senza crocette sui picchi
+
+% ---- Tratto e griglia -------------------------------------------------
+%\def\opzioni{seed=7,weight=1.8}           % linee piu' spesse
+%\def\opzioni{seed=7,weight=0.6}           % linee piu' sottili
+%\def\opzioni{seed=7,step=2}               % curve piu' lisce (piu' lento)
+%\def\opzioni{seed=7,step=5}               % curve piu' spigolose (piu' veloce)
+
+% ---- Estensione e distanza dal testo ----------------------------------
+%\def\opzioni{seed=7,density=0.7}          % le curve si fermano prima
+%\def\opzioni{seed=7,density=1.8}          % le curve arrivano piu' lontano
+%\def\opzioni{seed=7,clear=24}             % piu' distanza dal testo
+
+% ---- Fronte/retro e alone attorno alle note --------------------------
+%\def\opzioni{seed=7,twoside=false}        % pagine pari NON specchiate
+%\def\opzioni{seed=7,halo=0}               % le note a margine finiscono sulle curve
+%\def\opzioni{seed=7,halo=14}              % alone piu' largo
+
+% ---- Scala automatica (da usare con i formati A5 e letter sopra) -----
+%\def\opzioni{seed=7,autoscale=true}
+%\def\opzioni{seed=7,autoscale=true,palette=ink}
+
+% ---- Combinazioni complete -------------------------------------------
+%\def\opzioni{seed=12,palette=ink,where={topleft,bottomright},levels=30}
+%\def\opzioni{palette=sea,where=topbottom,feature=120}         % seme casuale
+%\def\opzioni{palette=mono,where=sides,levels=60,index=10,weight=0.8}
+
+\usepackage[\opzioni]{topomargins}
+
+% scrive un elenco di opzioni separate da virgola, andando a capo dopo le virgole
+% (le graffe di where={...} restano intere)
+\makeatletter
+\newcommand{\mostra}[1]{\def\sep{}%
+  \@for\voce:=#1\do{\sep\texttt{\expandafter\detokenize\expandafter{\voce}}\def\sep{,\ }}}
+\makeatother
+\def\vuoto{}
+\title{Prova delle configurazioni di \texttt{topomargins}}
+\author{}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+{\raggedright
+\noindent\textbf{Opzioni attive:}
+\ifx\opzioni\vuoto\emph{nessuna} (seme casuale, tutto intorno)\else\mostra{\opzioni}\fi\par
+\smallskip
+\noindent\textbf{Formato:} \mostra{\formato}\par}
+
+\section{Cosa stai guardando}
+
+Il margine di ogni pagina è una mappa topografica: le linee sottili sono le \emph{curve
+di livello}, a quote equidistanti, e una ogni cinque è una \emph{curva maestra}, più spessa.
+Le crocette segnano le quote dei picchi. Il terreno ha colline negli angoli, e le curve
+sfumano allontanandosi da lì, ognuna a una distanza diversa.
+
+Il margine non tocca mai il testo: corpo, testatina e piè di pagina sono un'area
+riservata.\marginpar{\footnotesize Nota a margine: le curve le girano attorno,
+lasciando un alone libero (opzione \texttt{halo}).}
+
+\lipsum[1-3]
+
+\section{Pagine affiancate}
+
+Il documento è in fronte/retro. Apri il PDF in vista a due pagine, con la
+copertina separata: le pagine 2 e 3, e poi 4 e 5, mostrano lo stesso paesaggio,
+specchiato. I nomi di \texttt{where} sono posizioni fisiche: \texttt{topleft} è
+sempre l'angolo in alto a sinistra, anche sulle pagine pari.
+
+\lipsum[4-9]
+
+\section{Dove guardare}
+
+\begin{itemize}
+  \item Ricompila senza opzioni: il seme è casuale, quindi cambia tutto. Nel log
+        trovi \texttt{topomargins: seed N (casuale; per riprodurlo: seed=N)}.
+  \item Con \texttt{where=top}, \texttt{sides}, \texttt{topleft}\ldots\ cambia la zona;
+        con \texttt{palette} i colori; con \texttt{levels}, \texttt{index} e
+        \texttt{feature} la forma del rilievo.
+  \item Con \texttt{halo=0} le note a margine non hanno più lo spazio libero attorno.
+  \item Con \texttt{twoside=false} le pagine pari non sono più specchiate.
+\end{itemize}
+
+\lipsum[10-16]\marginpar{\footnotesize Seconda nota, su un'altra pagina.}
+
+\lipsum[17-22]
+
+\end{document}

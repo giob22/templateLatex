@@ -1,0 +1,164 @@
+% !TEX program = lualatex
+%
+% Prova delle configurazioni di asicmargins.   Compila con:   lualatex configurazioni.tex
+% (oppure:  compila.bat configurazioni.tex).  Serve LuaLaTeX.
+%
+% COME SI USA
+%   1. Qui sotto ci sono molte configurazioni, una per riga, tutte commentate con %.
+%   2. Togli il % davanti a UNA riga e ricompila. Se ne attivi piu' d'una vale l'ultima.
+%   3. La prima pagina scrive quali opzioni sono attive.
+%   4. Senza "seed=" il disegno cambia a ogni compilazione: il numero scelto e' nel
+%      file configurazioni.log ("asicmargins: seed N (casuale; ...)"). Scrivilo in
+%      seed=N per rivedere quella composizione.
+%
+% asicmargins.sty e asicmargins.lua devono stare in questa stessa cartella.
+
+\documentclass[11pt,twoside]{article}   % lascia twoside: serve per vedere la specchiatura
+\usepackage[italian]{babel}
+\usepackage{lipsum}
+
+% ======================================================================
+%  FORMATO DELLA PAGINA   (di default vale la prima riga)
+%  Con formati diversi da A4 attiva anche  autoscale=true  nelle opzioni.
+% ======================================================================
+\def\formato{a4paper,inner=3.2cm,outer=4cm,top=3.6cm,bottom=3.6cm,marginparwidth=2.4cm}
+%\def\formato{a4paper,margin=2.2cm,marginparwidth=1.6cm}                        % margini stretti
+%\def\formato{a4paper,margin=5cm,marginparwidth=3cm}                            % margini larghi
+%\def\formato{a5paper,inner=1.9cm,outer=2.3cm,top=2cm,bottom=2cm,marginparwidth=1.5cm}      % A5
+%\def\formato{letterpaper,inner=2.8cm,outer=3.6cm,top=3cm,bottom=3cm,marginparwidth=2.2cm}  % US letter
+
+\usepackage[\formato]{geometry}
+
+% ======================================================================
+%  OPZIONI DI asicmargins   (di default nessuna: seme casuale, tutto intorno)
+% ======================================================================
+\def\opzioni{}
+
+% ---- Seme: stesso numero = stessa composizione -----------------------
+%\def\opzioni{seed=7}                      % tutto intorno, seme fisso
+%\def\opzioni{seed=1}
+%\def\opzioni{seed=2}
+%\def\opzioni{seed=random}                 % come non scrivere nulla
+
+% ---- DOVE: lati (seme fisso, cosi' si confrontano) -------------------
+%\def\opzioni{seed=7,where=top}            % solo sopra
+% \def\opzioni{seed=7,where=bottom}         % solo sotto
+% \def\opzioni{seed=7,where=topbottom}      % sopra e sotto
+% \def\opzioni{seed=7,where=sides}          % solo ai lati
+% \def\opzioni{seed=7,where=left}           % solo a sinistra
+% \def\opzioni{seed=7,where=right}          % solo a destra
+
+% ---- DOVE: angoli -----------------------------------------------------
+% \def\opzioni{seed=7,where=topleft}
+%\def\opzioni{seed=7,where=topright}
+%\def\opzioni{seed=7,where=bottomleft}
+% \def\opzioni{seed=7,where=bottomright}
+% \def\opzioni{seed=7,where={topleft,bottomright}}   % due angoli opposti
+% \def\opzioni{seed=7,where={topright,bottomleft}}
+% \def\opzioni{seed=7,where=corners}                  % i quattro angoli
+
+% ---- DOVE: combinazioni di lati e angoli -----------------------------
+% \def\opzioni{seed=7,where={top,bottomleft}}
+% \def\opzioni{seed=7,where={left,topright}}
+
+% ---- Palette ---------------------------------------------------------
+% \def\opzioni{seed=7,palette=ink}                            % blu e oro, alla Flora
+%\def\opzioni{seed=7,palette=ink,where=sides}
+%\def\opzioni{seed=7,palette=ink,where={topleft,bottomright}}
+% \def\opzioni{seed=7,palette=mono}                           % scala di grigi
+%\def\opzioni{seed=7,palette=mono,where=topbottom}
+
+% ---- Densita' e griglia ----------------------------------------------
+% \def\opzioni{seed=7,density=0.6}          % margine piu' rado
+% \def\opzioni{seed=7,density=1.8}          % margine piu' pieno
+% \def\opzioni{seed=7,pitch=2.2}            % griglia fitta
+% \def\opzioni{seed=7,pitch=5.5}            % griglia larga
+% \def\opzioni{seed=7,clear=24}             % piu' distanza dal testo
+
+% ---- Elementi da togliere --------------------------------------------
+% \def\opzioni{seed=7,ring=false}                            % senza doppio anello
+% \def\opzioni{seed=7,blocks=false,macros=false,pads=false}  % solo piste e via
+% \def\opzioni{seed=7,metalthree=false,dummy=false}          % senza M3 e senza puntini
+%\def\opzioni{seed=7,where=sides,macros=false}
+
+% ---- Fronte/retro e alone attorno alle note --------------------------
+% \def\opzioni{seed=7,twoside=false}        % pagine pari NON specchiate
+% \def\opzioni{seed=7,halo=0}               % le note a margine finiscono sul disegno
+% \def\opzioni{seed=7,halo=14}              % alone piu' largo
+
+% ---- Scala automatica (da usare con i formati A5 e letter sopra) -----
+% \def\opzioni{seed=7,autoscale=true}
+% \def\opzioni{seed=7,autoscale=true,palette=ink}
+
+% ---- Combinazioni complete -------------------------------------------
+% \def\opzioni{seed=12,palette=ink,where={topleft,bottomright},density=0.9}
+% \def\opzioni{palette=ink,where=topbottom,pitch=2.8}        % seme casuale
+% \def\opzioni{palette=mono,where=sides,density=0.8,ring=false}
+
+\usepackage[\opzioni]{asicmargins}
+
+% scrive un elenco di opzioni separate da virgola, andando a capo dopo le virgole
+% (le graffe di where={...} restano intere)
+\makeatletter
+\newcommand{\mostra}[1]{\def\sep{}%
+  \@for\voce:=#1\do{\sep\texttt{\expandafter\detokenize\expandafter{\voce}}\def\sep{,\ }}}
+\makeatother
+\def\vuoto{}
+\title{Prova delle configurazioni di \texttt{asicmargins}}
+\author{}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+{\raggedright
+\noindent\textbf{Opzioni attive:}
+\ifx\opzioni\vuoto\emph{nessuna} (seme casuale, tutto intorno)\else\mostra{\opzioni}\fi\par
+\smallskip
+\noindent\textbf{Formato:} \mostra{\formato}\par}
+
+\section{Cosa stai guardando}
+
+Il margine di ogni pagina è disegnato come il layout di un chip. Negli angoli ci
+sono blocchi di \emph{celle standard}, file di rettangoli separate dai rail di
+alimentazione VDD e VSS. I rettangoli grigi a righe sui lati sono \emph{macro di
+memoria}. Le piste sono su tre livelli di metallo: M1 orizzontale, M2 verticale
+e M3, più largo e rado. I quadratini agli incroci sono i \emph{via}. In alto e in
+basso ci sono i \emph{bond pad}, e il doppio filetto lungo il bordo è il
+\emph{seal ring}. Dove il disegno è meno fitto compare il \emph{dummy fill},
+i puntini grigi.
+
+Il margine non tocca mai il testo: corpo, testatina e piè di pagina sono un'area
+riservata.\marginpar{\footnotesize Nota a margine: il disegno le gira attorno,
+lasciando un alone libero (opzione \texttt{halo}).}
+
+\lipsum[1-3]
+
+\section{Pagine affiancate}
+
+Il documento è in fronte/retro. Apri il PDF in vista a due pagine, con la
+copertina separata: le pagine 2 e 3, e poi 4 e 5, sono una specchiata dell'altra.
+Blocchi, macro e pad stanno negli stessi punti rispetto alla piega, mentre le
+singole piste cambiano da pagina a pagina. I nomi di \texttt{where} sono
+posizioni fisiche: \texttt{topleft} è sempre l'angolo in alto a sinistra, anche
+sulle pagine pari.
+
+\lipsum[4-9]
+
+\section{Dove guardare}
+
+\begin{itemize}
+  \item Ricompila senza opzioni: il seme è casuale, quindi cambia tutto. Nel log
+        trovi \texttt{asicmargins: seed N (casuale; per riprodurlo: seed=N)}.
+  \item Con \texttt{where=top}, \texttt{sides}, \texttt{topleft}\ldots\ cambia la zona;
+        con \texttt{palette=ink} i colori; con \texttt{density} e \texttt{pitch}
+        quanto è fitto il disegno.
+  \item Con \texttt{halo=0} le note a margine non hanno più lo spazio libero attorno.
+  \item Con \texttt{twoside=false} le pagine pari non sono più specchiate.
+\end{itemize}
+
+\lipsum[10-16]\marginpar{\footnotesize Seconda nota, su un'altra pagina.}
+
+\lipsum[17-22]
+
+\end{document}

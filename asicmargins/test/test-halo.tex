@@ -1,0 +1,20 @@
+% Numero di pagina e testatina nel margine esterno, piu' note a margine:
+% il margine deve lasciare un alone libero attorno a tutto cio' che e' stampato
+\documentclass[a4paper,11pt,twoside]{article}
+\usepackage[a4paper,inner=3cm,outer=4.4cm,top=3.6cm,bottom=3.6cm,marginparwidth=2.6cm]{geometry}
+\usepackage{lipsum}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhfoffset[LE,RO]{2.4cm}% lato esterno ([O] da solo vorrebbe dire "pagine dispari")
+\fancyhead[LE,RO]{\textbf{\thepage}}
+\fancyhead[RE,LO]{\small\itshape Layout di un chip come cornice}
+\fancyfoot[C]{\footnotesize asicmargins, prova dell'alone}
+\usepackage[seed=9,halo=6]{asicmargins}
+\begin{document}
+\section*{Alone attorno a testatine e note}
+\lipsum[1]\marginpar{\footnotesize Nota a margine: il routing deve girarle attorno.}
+\lipsum[2-4]\marginpar{\footnotesize Seconda nota, piu' in basso.}
+\lipsum[5-9]\marginpar{\footnotesize Nota sulla pagina pari.}
+\lipsum[10-20]
+\end{document}

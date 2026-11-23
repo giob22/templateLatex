@@ -1,0 +1,25 @@
+% SPDX-License-Identifier: MIT
+% Copyright (c) 2026 giob22. Vedi il file LICENSE.
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{asicmargins}[2026/11/07 v0.3 Margini in stile layout di chip, generati per ogni pagina]
+
+\RequirePackage{margincore}
+\MarginCoreDeclare{asicmargins}{asicmargins.lua}
+
+% opzioni proprie del motivo (quelle comuni -- seed, where, density, clear, twoside,
+% autoscale, halo -- le dichiara margincore)
+\DeclareKeys[asicmargins]{
+  pitch.code      = {\directlua{asicmargins.set("pitch", string.gsub("#1","pt$",""))}},
+  blockwidth.code = {\directlua{asicmargins.set("blockw", string.gsub("#1","pt$",""))}},
+  palette.code    = {\directlua{asicmargins.set("palette","#1")}},
+  ring.code       = {\directlua{asicmargins.set("ring","#1")}},
+  blocks.code     = {\directlua{asicmargins.set("blocks","#1")}},
+  macros.code     = {\directlua{asicmargins.set("macros","#1")}},
+  pads.code       = {\directlua{asicmargins.set("pads","#1")}},
+  dummy.code      = {\directlua{asicmargins.set("dummy","#1")}},
+  metalthree.code = {\directlua{asicmargins.set("m3","#1")}},
+}
+
+\MarginCoreFinish{asicmargins}
+
+\endinput

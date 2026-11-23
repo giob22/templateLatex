@@ -1,0 +1,24 @@
+% SPDX-License-Identifier: MIT
+% Copyright (c) 2026 giob22. Vedi il file LICENSE.
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{topomargins}[2026/11/07 v0.1 Margini a curve di livello, generati per ogni pagina]
+
+\RequirePackage{margincore}
+\MarginCoreDeclare{topomargins}{topomargins.lua}
+
+% opzioni proprie del motivo (quelle comuni -- seed, where, density, clear, twoside,
+% autoscale, halo -- le dichiara margincore)
+\DeclareKeys[topomargins]{
+  palette.code = {\directlua{topomargins.set("palette","#1")}},
+  levels.code  = {\directlua{topomargins.set("levels","#1")}},
+  index.code   = {\directlua{topomargins.set("index","#1")}},
+  feature.code = {\directlua{topomargins.set("feature", string.gsub("#1","pt$",""))}},
+  step.code    = {\directlua{topomargins.set("step", string.gsub("#1","pt$",""))}},
+  hills.code   = {\directlua{topomargins.set("hills","#1")}},
+  peaks.code   = {\directlua{topomargins.set("peaks","#1")}},
+  weight.code  = {\directlua{topomargins.set("weight","#1")}},
+}
+
+\MarginCoreFinish{topomargins}
+
+\endinput

@@ -1,0 +1,57 @@
+% SPDX-License-Identifier: MIT
+% Copyright (c) 2026 giob22. Vedi il file LICENSE.
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{margincore}[2026/11/07 v0.1 Motore comune dei margini generativi per LuaLaTeX]
+
+% Questo pacchetto non disegna nulla: lo caricano i pacchetti dei singoli motivi
+% (asicmargins, topomargins, ...). Offre
+%   \MarginCoreDeclare{<nome>}{<file>.lua}   carica il motivo e dichiara le opzioni comuni
+%   \MarginCoreFinish{<nome>}                elabora le opzioni, crea \<nome>setup, \<nome>on,
+%                                            \<nome>off e aggancia il disegno alle pagine
+% Un pacchetto di motivo aggiunge le proprie opzioni con \DeclareKeys[<nome>]{...}
+% fra le due chiamate.
+
+\RequirePackage{iftex}
+\RequireLuaTeX
+
+\directlua{
+  local f = kpse.find_file("margincore.lua", "lua") or "margincore.lua"
+  margincore = dofile(f)
+}
+
+% Area del testo della pagina corrente, nel riferimento della pagina (origine in alto a sinistra).
+% \evensidemargin vale solo in fronte/retro, come in \@outputpage.
+\def\margincore@side{\if@twoside\ifodd\value{page}\oddsidemargin\else\evensidemargin\fi\else\oddsidemargin\fi}
+\def\margincore@xa{\dimexpr 1in+\hoffset+\margincore@side\relax}
+\def\margincore@xb{\dimexpr 1in+\hoffset+\margincore@side+\textwidth\relax}
+\def\margincore@ya{\dimexpr 1in+\voffset+\topmargin\relax}
+\def\margincore@yb{\dimexpr 1in+\voffset+\topmargin+\headheight+\headsep+\textheight+\footskip\relax}
+
+\newcommand\MarginCoreDeclare[2]{%
+  \directlua{#1 = margincore.new{ name = "#1", motif = margincore.loadmotif("#2") }}%
+  \DeclareKeys[#1]{%
+    seed.code      = {\directlua{#1.set("seed","##1")}},
+    density.code   = {\directlua{#1.set("density","##1")}},
+    clear.code     = {\directlua{#1.set("clear", string.gsub("##1","pt$",""))}},
+    twoside.code   = {\directlua{#1.set("twoside","##1")}},
+    autoscale.code = {\directlua{#1.set("autoscale","##1")}},
+    halo.code      = {\directlua{#1.set("halo", string.gsub("##1","pt$",""))}},
+    where.code     = {\directlua{#1.set("where","##1")}},
+  }%
+}
+
+\newcommand\MarginCoreFinish[1]{%
+  \ProcessKeyOptions[#1]%
+  \expandafter\NewDocumentCommand\csname #1setup\endcsname{m}{\SetKeys[#1]{##1}}%
+  \expandafter\NewDocumentCommand\csname #1on\endcsname{}{\directlua{#1.enabled = true}}%
+  \expandafter\NewDocumentCommand\csname #1off\endcsname{}{\directlua{#1.enabled = false}}%
+  \AddToHook{shipout/background}{%
+    \put(0,0){\directlua{#1.page(\the\value{page},
+      \number\paperwidth, \number\paperheight,
+      \number\margincore@xa, \number\margincore@ya, \number\margincore@xb, \number\margincore@yb,
+      \if@twoside true\else false\fi, \number\ShipoutBox,
+      \number\dimexpr 1in+\hoffset\relax, \number\dimexpr 1in+\voffset\relax)}}%
+  }%
+}
+
+\endinput

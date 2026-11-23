@@ -1,0 +1,26 @@
+% Una modalita' di where per pagina, in fronte/retro: le pagine pari sono specchiate,
+% ma i nomi (topleft, left, ...) restano posizioni fisiche sulla pagina.
+\documentclass[a4paper,11pt,twoside]{article}
+\usepackage[a4paper,inner=3.2cm,outer=3.2cm,top=3.4cm,bottom=3.4cm]{geometry}
+\usepackage{lipsum}
+\usepackage[seed=4,palette=chip]{asicmargins}
+\newcommand{\prova}[1]{%
+  \asicmarginssetup{where={#1}}%
+  \section*{\texttt{where=#1}}%
+  \lipsum[1]\clearpage}
+\begin{document}
+\prova{all}
+\prova{top}
+\prova{bottom}
+\prova{topbottom}
+\prova{sides}
+\prova{left}
+\prova{right}
+\prova{topleft}
+\prova{topright}
+\prova{bottomleft}
+\prova{bottomright}
+\prova{topleft,bottomright}
+\prova{corners}
+\prova{top,bottomleft}
+\end{document}

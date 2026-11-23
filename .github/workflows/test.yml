@@ -1,0 +1,42 @@
+name: test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: TeX Live ${{ matrix.texlive }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        texlive: ['2023', 'latest']
+    steps:
+      - uses: actions/checkout@v7
+      - uses: TeX-Live/setup-texlive-action@v4
+        with:
+          version: ${{ matrix.texlive }}
+          packages: |
+            scheme-basic
+            collection-luatex
+            collection-latexrecommended
+            lipsum
+      - name: Versione di LuaLaTeX
+        run: lualatex --version | head -2
+      - name: Prove di asicmargins
+        working-directory: asicmargins/test
+        run: texlua run-tests.lua
+      - name: Prove di topomargins
+        working-directory: topomargins/test
+        run: texlua run-tests.lua
+      - name: Fine dei file di log di compilazione (solo se fallisce)
+        if: failure()
+        run: |
+          for f in */test/build/*.log; do
+            echo "=== $f"; tail -n 30 "$f"
+          done
