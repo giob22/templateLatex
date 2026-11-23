@@ -1,0 +1,18 @@
+% Le opzioni proprie del motivo, una combinazione per pagina (\fpgamarginssetup, cumulative)
+\documentclass[a4paper,11pt]{article}
+\usepackage[a4paper,margin=3.6cm]{geometry}
+\usepackage{lipsum}
+\usepackage[seed=6]{fpgamargins}
+\newcommand{\prova}[1]{\fpgamarginssetup{#1}\section*{\texttt{#1}}\lipsum[1]\clearpage}
+\begin{document}
+\prova{palette=blue}
+\prova{palette=ink}
+\prova{palette=mono}
+\prova{palette=blue,pitch=3}
+\prova{pitch=7}
+\prova{pitch=4.6,blocks=false}
+\prova{blocks=true,nets=false}
+\prova{nets=true,pips=false}
+\prova{pips=true,weight=1.8}
+\prova{weight=0.6}
+\end{document}

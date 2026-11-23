@@ -12,6 +12,7 @@ nel preambolo, e con `seed=` lo stesso documento dà sempre lo stesso risultato.
 
 ![asicmargins: margini a layout di chip](docs/anteprima-asicmargins.png)
 ![topomargins: margini a curve di livello](docs/anteprima-topomargins.png)
+![fpgamargins: margini a matrice FPGA](docs/anteprima-fpgamargins.png)
 
 ## Pacchetti
 
@@ -23,7 +24,7 @@ Uno per motivo, realizzati uno alla volta. I nomi di quelli ancora da fare sono 
 | [`topomargins`](topomargins/) | curve di livello | v0.1 pronto | [immagine](docs/anteprima-topomargins.png) |
 | `pcbmargins` | circuito stampato | da fare | [bozza](bozze/01-pcb.png) |
 | `clockmargins` | albero di clock | da fare | [bozza](bozze/02-albero-di-clock.png) |
-| `fpgamargins` | fabric FPGA | da fare | [bozza](bozze/03-fpga.png) |
+| [`fpgamargins`](fpgamargins/) | matrice di interconnessione FPGA | v0.1 pronto | [immagine](docs/anteprima-fpgamargins.png) |
 | `timingmargins` | diagrammi temporali | da fare | [bozza](bozze/04-diagrammi-temporali.png) |
 | `wafermargins` | wafer map | da fare | [bozza](bozze/05-wafer.png) |
 | `rootmargins` | radici e vene | da fare | [bozza](bozze/07-radici.png) |
@@ -84,7 +85,7 @@ MiKTeX. Con `pdflatex` o `xelatex` non funziona: il disegno è calcolato in Lua.
 | Cartella | Contenuto |
 |---|---|
 | [`margincore/`](margincore/) | il motore comune: seme, zone `where`, alone, densità, fronte/retro, scala. Il suo README spiega come si scrive un nuovo motivo |
-| `asicmargins/`, `topomargins/` | un pacchetto per cartella: `.sty`, `.lua`, README, esempio, `test/` |
+| `asicmargins/`, `topomargins/`, `fpgamargins/` | un pacchetto per cartella: `.sty`, `.lua`, README, esempio, `test/` |
 | [`tools/`](tools/) | `testlib.lua` (parti comuni dei test), `release.py` (archivio di rilascio), `try_all.py` (prova tutte le configurazioni di un file) |
 | `bozze/` | bozze dei motivi, in Python (servono `numpy` e `Pillow`) |
 | `docs/` | le anteprime di questo README |

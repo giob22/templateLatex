@@ -878,10 +878,228 @@ def streets(c, rnd):
                 c.line(path, 2.6, "#e0993e")
 
 
+# ---------------------------------------------------------------- 3b. FPGA: matrice di interconnessione
+def fpga2(c, rnd):
+    """Piste orizzontali e verticali con punti di connessione programmabili (PIP) agli incroci,
+    blocchi logici (CLB, BRAM, DSP) sparsi e alcune connessioni già instradate."""
+    t = 4.6
+    x0 = y0 = RI + 3
+    nx, ny = int((W - 2 * RI - 6) / t), int((H - 2 * RI - 6) / t)
+    X = lambda i: x0 + i * t
+    Y = lambda j: y0 + j * t
+    ok = lambda i, j: 0 <= i < nx and 0 <= j < ny and fr(X(i), Y(j))
+    Hs = [[False] * nx for _ in range(ny)]       # Hs[j][i]: tratto (i,j)-(i+1,j)
+    Vs = [[False] * nx for _ in range(ny)]       # Vs[j][i]: tratto (i,j)-(i,j+1)
+    for j in range(ny):
+        i = 0
+        while i < nx - 1:
+            n = rnd.randint(4, 14)
+            if rnd.random() < min(1, dn(X(i + n // 2), Y(j))):
+                for k in range(i, min(i + n, nx - 1)):
+                    Hs[j][k] = ok(k, j) and ok(k + 1, j)
+            i += n + rnd.randint(0, 4)
+    for i in range(nx):
+        j = 0
+        while j < ny - 1:
+            n = rnd.randint(4, 14)
+            if rnd.random() < min(1, dn(X(i), Y(j + n // 2))):
+                for k in range(j, min(j + n, ny - 1)):
+                    Vs[k][i] = ok(i, k) and ok(i, k + 1)
+            j += n + rnd.randint(0, 4)
+    TR, LONG, PIP, ON, NET = "#9fb2d0", "#6f88b5", "#6d84ad", "#1f3a6e", "#e07b20"
+    for j in range(ny):                                          # piste orizzontali
+        i = 0
+        while i < nx - 1:
+            if Hs[j][i]:
+                k = i
+                while k + 1 < nx - 1 and Hs[j][k + 1]:
+                    k += 1
+                c.line([(X(i), Y(j)), (X(k + 1), Y(j))], .9 if j % 6 == 0 else .45, LONG if j % 6 == 0 else TR)
+                i = k + 1
+            else:
+                i += 1
+    for i in range(nx):                                          # piste verticali
+        j = 0
+        while j < ny - 1:
+            if Vs[j][i]:
+                k = j
+                while k + 1 < ny - 1 and Vs[k + 1][i]:
+                    k += 1
+                c.line([(X(i), Y(j)), (X(i), Y(k + 1))], .9 if i % 6 == 0 else .45, LONG if i % 6 == 0 else TR)
+                j = k + 1
+            else:
+                j += 1
+    node = lambda i, j: ((i > 0 and Hs[j][i - 1]) or (i < nx - 1 and Hs[j][i])) and \
+                        ((j > 0 and Vs[j - 1][i]) or (j < ny - 1 and Vs[j][i]))
+    # connessioni già instradate: percorsi che seguono le piste
+    for _ in range(400):
+        i, j = rnd.randrange(nx), rnd.randrange(ny)
+        if not node(i, j):
+            continue
+        pts, d = [(X(i), Y(j))], rnd.choice([(1, 0), (-1, 0), (0, 1), (0, -1)])
+        for _ in range(rnd.randint(30, 80)):
+            cand = []
+            for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                if (dx, dy) == (-d[0], -d[1]):
+                    continue
+                if dx and ((dx > 0 and i < nx - 1 and Hs[j][i]) or (dx < 0 and i > 0 and Hs[j][i - 1])):
+                    cand.append((dx, dy))
+                if dy and ((dy > 0 and j < ny - 1 and Vs[j][i]) or (dy < 0 and j > 0 and Vs[j - 1][i])):
+                    cand.append((dx, dy))
+            if not cand:
+                break
+            d = d if (d in cand and rnd.random() < .75) else rnd.choice(cand)
+            i, j = i + d[0], j + d[1]
+            pts.append((X(i), Y(j)))
+        if len(pts) > 12:
+            c.line(pts, 1.3, NET)
+            for p in (pts[0], pts[-1]):
+                c.circ(p[0], p[1], 1.8, fill=NET)
+    for j in range(ny):                                          # punti di connessione
+        for i in range(nx):
+            if (i + j) % 2 == 0 and node(i, j):
+                if rnd.random() < .2:
+                    c.circ(X(i), Y(j), 1.0, fill=ON)
+                else:
+                    c.circ(X(i), Y(j), .8, fill="white", outline=PIP, w=.3)
+    # blocchi logici
+    n = 9
+    for bi in range(1, nx - n - 1, 15):
+        for bj in range(1, ny - n - 1, 15):
+            r = (X(bi), Y(bj), X(bi + n), Y(bj + n))
+            if overlaps(r) or not inring(r) or dn((r[0] + r[2]) / 2, (r[1] + r[3]) / 2) < .5 or rnd.random() > .85:
+                continue
+            kind = (bi // 15) % 4
+            if kind == 2:       # BRAM
+                c.rect(*r, fill="#fbeedd", outline="#c58a3b", w=.7)
+                for k in range(1, 8):
+                    c.line([(r[0] + 2, r[1] + k * (r[3] - r[1]) / 8), (r[2] - 2, r[1] + k * (r[3] - r[1]) / 8)], .35, "#d9a460")
+            elif kind == 3:     # DSP
+                c.rect(*r, fill="#ece6f6", outline="#7a5fb0", w=.7)
+                c.line([(r[0] + 3, r[1] + 3), (r[2] - 3, r[3] - 3)], .5, "#9a85c8")
+                c.line([(r[2] - 3, r[1] + 3), (r[0] + 3, r[3] - 3)], .5, "#9a85c8")
+            else:               # CLB
+                c.rect(*r, fill="#e3f1ef", outline="#3a8a85", w=.7)
+                w = (r[2] - r[0]) / 2
+                for a in (0, 1):
+                    for b in (0, 1):
+                        c.rect(r[0] + 3 + a * w, r[1] + 3 + b * w, r[0] + w - 3 + a * w, r[1] + w - 3 + b * w, fill="#a9d4cf")
+
+
+# ---------------------------------------------------------------- 9. porte logiche
+def _bez(p0, p1, p2, n=8):
+    return [((1 - t) ** 2 * p0[0] + 2 * (1 - t) * t * p1[0] + t * t * p2[0],
+             (1 - t) ** 2 * p0[1] + 2 * (1 - t) * t * p1[1] + t * t * p2[1]) for t in [i / n for i in range(n + 1)]]
+
+
+def logic(c, rnd):
+    """Schema di porte logiche (AND, OR, NAND, NOR, XOR, NOT) e flip-flop D collegati da fili:
+    il segnale scorre da sinistra a destra, con fili di bus nei canali tra le righe."""
+    gw, gh, cw, ch = 22.0, 14.0, 36.0, 24.0
+    x0 = y0 = RI + 6
+    ncol, nrow = int((W - 2 * RI - 12) // cw), int((H - 2 * RI - 12) // ch)
+    NAVY, ORG, BUS = "#2a4570", "#c9731a", "#8aa0c4"
+    grid = {}
+    for r in range(nrow):
+        for k in range(ncol):
+            gx, gy = x0 + k * cw, y0 + r * ch + (ch - gh) / 2
+            rect = (gx - 6, gy - 4, gx + gw + 10, gy + gh + 4)
+            if overlaps(rect) or not inring(rect) or rnd.random() > min(1, dn(gx + gw / 2, gy + gh / 2) * 1.05):
+                continue
+            kind = "dff" if k % 4 == 3 and rnd.random() < .8 else \
+                rnd.choice(["and", "or", "nand", "nor", "xor", "not", "and", "or"])
+            grid[(k, r)] = dict(kind=kind, x=gx, y=gy, used=set())
+
+    def pins(g):
+        x, y, k = g["x"], g["y"], g["kind"]
+        ins = [(x, y + gh / 2)] if k == "not" else [(x, y + gh * .3)] if k == "dff" else \
+            [(x, y + gh * .3), (x, y + gh * .7)]
+        return ins, (x + gw + (3.2 if k in ("nand", "nor", "not") else 0), y + gh / 2)
+
+    # canali tra le righe: fili di bus
+    for r in range(nrow - 1):
+        if rnd.random() > .45:
+            continue
+        a, n = rnd.randrange(ncol), rnd.randint(3, 9)
+        yy = y0 + (r + 1) * ch
+        xa, xb = x0 + a * cw, min(x0 + (a + n) * cw, W - RI - 6)
+        if all(fr(x, yy) for x in (xa, (xa + xb) / 2, xb)) and xb - xa > 20:
+            for q in (-1.6, 0, 1.6):
+                c.line([(xa, yy + q), (xb, yy + q)], .45, BUS)
+            c.rect(xa - 1, yy - 3, xa, yy + 3, fill=BUS)
+            c.rect(xb, yy - 3, xb + 1, yy + 3, fill=BUS)
+    # fili tra le porte della colonna accanto
+    for (k, r), g in grid.items():
+        ins, out = pins(g)
+        targets = [grid[(k + 1, r + d)] for d in (-1, 0, 1) if (k + 1, r + d) in grid]
+        rnd.shuffle(targets)
+        done = 0
+        for t in targets[:2 if rnd.random() < .3 else 1]:
+            tin, _ = pins(t)
+            free_in = [i for i in range(len(tin)) if i not in t["used"]]
+            if not free_in:
+                continue
+            i = rnd.choice(free_in)
+            t["used"].add(i)
+            mx = (out[0] + tin[i][0]) / 2
+            c.line([out, (mx, out[1]), (mx, tin[i][1]), tin[i]], .6, NAVY)
+            done += 1
+            if done == 2:
+                c.circ(mx, out[1], 1.1, fill=NAVY)
+        below = grid.get((k, r + 1))             # porta nella riga sotto: filo che gira attorno nel canale
+        if below and rnd.random() < .7:
+            tin, _ = pins(below)
+            free_in = [i for i in range(len(tin)) if i not in below["used"]]
+            if free_in:
+                i = rnd.choice(free_in)
+                below["used"].add(i)
+                yc = y0 + (r + 1) * ch
+                c.line([out, (out[0] + 7, out[1]), (out[0] + 7, yc), (tin[i][0] - 7, yc),
+                        (tin[i][0] - 7, tin[i][1]), tin[i]], .6, NAVY)
+                done += 1
+        if not done:
+            c.line([out, (out[0] + 6, out[1])], .6, NAVY)
+            c.circ(out[0] + 6, out[1], 1.1, fill=NAVY)
+    # porte
+    for g in grid.values():
+        x, y, k = g["x"], g["y"], g["kind"]
+        w, h = gw, gh
+        ink = ORG if k == "dff" else NAVY
+        ins, out = pins(g)
+        for i, p in enumerate(ins):
+            if i not in g["used"]:
+                c.line([(p[0] - 5, p[1]), p], .6, NAVY)
+                c.circ(p[0] - 5, p[1], 1.0, fill="white", outline=NAVY, w=.4)
+        if k in ("and", "nand"):
+            bw = w * .5
+            pts = [(x, y), (x + bw, y)] + [(x + bw + h / 2 * math.cos(-math.pi / 2 + math.pi * i / 10),
+                                            y + h / 2 + h / 2 * math.sin(-math.pi / 2 + math.pi * i / 10)) for i in range(11)] + [(x, y + h)]
+            c.poly(pts, fill="white", outline=ink, w=.8)
+        elif k in ("or", "nor", "xor"):
+            back = [(x + .26 * w * math.sin(math.pi * i / 8), y + h * i / 8) for i in range(9)]
+            top = _bez((x, y), (x + w * .55, y), (x + w, y + h / 2))
+            bot = _bez((x + w, y + h / 2), (x + w * .55, y + h), (x, y + h))
+            c.poly(top + bot[1:] + list(reversed(back))[1:-1], fill="white", outline=ink, w=.8)
+            if k == "xor":
+                c.line([(x - 3.2 + .26 * w * math.sin(math.pi * i / 8), y + h * i / 8) for i in range(9)], .8, ink)
+        elif k == "not":
+            c.poly([(x, y), (x + w, y + h / 2), (x, y + h)], fill="white", outline=ink, w=.8)
+        else:
+            c.rect(x, y, x + w, y + h, fill="#fdf3e6", outline=ink, w=.8)
+            c.poly([(x, y + h * .62), (x + 3.4, y + h * .76), (x, y + h * .9)], outline=ink, w=.6)
+            c.line([(x - 5, y + h * .76), (x, y + h * .76)], .6, ink)
+            c.rect(x + w - 8, y + 3.5, x + w - 3, y + 4.5, fill="#d9b48a")
+        if k in ("nand", "nor", "not"):
+            c.circ(x + w + 1.6, y + h / 2, 1.6, fill="white", outline=ink, w=.7)
+        if rnd.random() < .35:
+            c.rect(x, y - 3.4, x + rnd.uniform(6, 13), y - 2.4, fill="#b5bcc9")
+
+
 MOTIVI = [("01-pcb", "PCB", pcb), ("02-albero-di-clock", "Albero di clock", clock), ("03-fpga", "FPGA", fpga),
+          ("03b-fpga-interconnessioni", "FPGA: interconnessioni", fpga2),
           ("04-diagrammi-temporali", "Diagrammi temporali", timing), ("05-wafer", "Wafer map", wafer),
           ("06-curve-di-livello", "Curve di livello", topo), ("07-radici", "Radici e vene", roots),
-          ("08-mappa-stradale", "Mappa stradale", streets)]
+          ("08-mappa-stradale", "Mappa stradale", streets), ("09-porte-logiche", "Porte logiche", logic)]
 
 if __name__ == "__main__":
     want = sys.argv[1:]

@@ -1,0 +1,22 @@
+% SPDX-License-Identifier: MIT
+% Copyright (c) 2026 giob22. Vedi il file LICENSE.
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{fpgamargins}[2026/11/23 v0.1 Margini a matrice di interconnessione FPGA, generati per ogni pagina]
+
+\RequirePackage{margincore}
+\MarginCoreDeclare{fpgamargins}{fpgamargins.lua}
+
+% opzioni proprie del motivo (quelle comuni -- seed, where, density, clear, twoside,
+% autoscale, halo -- le dichiara margincore)
+\DeclareKeys[fpgamargins]{
+  palette.code = {\directlua{fpgamargins.set("palette","#1")}},
+  pitch.code   = {\directlua{fpgamargins.set("pitch", string.gsub("#1","pt$",""))}},
+  blocks.code  = {\directlua{fpgamargins.set("blocks","#1")}},
+  nets.code    = {\directlua{fpgamargins.set("nets","#1")}},
+  pips.code    = {\directlua{fpgamargins.set("pips","#1")}},
+  weight.code  = {\directlua{fpgamargins.set("weight","#1")}},
+}
+
+\MarginCoreFinish{fpgamargins}
+
+\endinput

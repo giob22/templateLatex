@@ -34,6 +34,9 @@ jobs:
       - name: Prove di topomargins
         working-directory: topomargins/test
         run: texlua run-tests.lua
+      - name: Prove di fpgamargins
+        working-directory: fpgamargins/test
+        run: texlua run-tests.lua
       - name: Fine dei file di log di compilazione (solo se fallisce)
         if: failure()
         run: |
